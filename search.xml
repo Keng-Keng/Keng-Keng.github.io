@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>用heat编写摸板，快速生成模板</title>
+      <link href="/2023/10/12/heat%E5%BF%AB%E9%80%9F%E5%88%9B%E5%BB%BA%E6%A8%A1%E6%9D%BF/"/>
+      <url>/2023/10/12/heat%E5%BF%AB%E9%80%9F%E5%88%9B%E5%BB%BA%E6%A8%A1%E6%9D%BF/</url>
+      
+        <content type="html"><![CDATA[<h4 id="使用自己搭建的OpenStack私有云平台，用heat编写摸板-heat-template-version-2016-04-08-创建名为”chinaskills”的domain-在此domain下创建名为beijing-group的租户，在此租户下创建名为cloud-的用户，将此文件命名及保存在-root-user-create-yml。完成后提交controller点的用户名、密码和IP地址到答题框。-竞赛系统会执行yaml文件，请确保执行的环境"><a href="#使用自己搭建的OpenStack私有云平台，用heat编写摸板-heat-template-version-2016-04-08-创建名为”chinaskills”的domain-在此domain下创建名为beijing-group的租户，在此租户下创建名为cloud-的用户，将此文件命名及保存在-root-user-create-yml。完成后提交controller点的用户名、密码和IP地址到答题框。-竞赛系统会执行yaml文件，请确保执行的环境" class="headerlink" title="使用自己搭建的OpenStack私有云平台，用heat编写摸板(heat_template_version:2016-04-08)创建名为”chinaskills”的domain,在此domain下创建名为beijing_group的租户，在此租户下创建名为cloud 的用户，将此文件命名及保存在&#x2F;root&#x2F;user create.yml。完成后提交controller点的用户名、密码和IP地址到答题框。(竞赛系统会执行yaml文件，请确保执行的环境)"></a>使用自己搭建的OpenStack私有云平台，用heat编写摸板(heat_template_version:2016-04-08)创建名为”chinaskills”的domain,在此domain下创建名为beijing_group的租户，在此租户下创建名为cloud 的用户，将此文件命名及保存在&#x2F;root&#x2F;user create.yml。完成后提交controller点的用户名、密码和IP地址到答题框。(竞赛系统会执行yaml文件，请确保执行的环境)</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">显示所有resource</span></span><br><span class="line">[root@controller ~]# heat resource-type-list</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">将下方输出内容，选择性复制到/root/user_create.yaml中 只复制resources下的内容，并将get_param修改为get_resource从别的resource中获取</span></span><br><span class="line">[root@controller ~]# heat resource-type-template OS::Keystone::Domain -t hot -F yaml</span><br><span class="line">[root@controller ~]# heat resource-type-template OS::Keystone::Project -t hot -F yaml</span><br><span class="line">[root@controller ~]# heat resource-type-template OS::Keystone::User -t hot -F yaml</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">heat_template_version: &#x27;2016-04-08&#x27;</span><br><span class="line">resources:</span><br><span class="line">  KeystoneDomain:</span><br><span class="line">    properties:</span><br><span class="line">      enabled: true</span><br><span class="line">      name: chinaskills</span><br><span class="line">    type: OS::Keystone::Domain</span><br><span class="line">  KeystoneProject:</span><br><span class="line">    properties:</span><br><span class="line">      domain: &#123;get_resource: KeystoneDomain&#125;</span><br><span class="line">      name: beijing_group</span><br><span class="line">    type: OS::Keystone::Project</span><br><span class="line">  KeystoneUser:</span><br><span class="line">    properties:</span><br><span class="line">      default_project: &#123;get_resource: KeystoneProject&#125;</span><br><span class="line">      domain: &#123;get_resource: KeystoneDomain&#125;</span><br><span class="line">      name: cloud</span><br><span class="line">    type: OS::Keystone::User</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">测试stack</span></span><br><span class="line">[root@controller ~]# openstack stack create -f yaml -t user_create.yaml user-stack</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">题目要求竞赛系统会执行yaml文件，确保执行的环境，所以先将测试创建的stack的删除</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">先将stack列出来</span></span><br><span class="line">[root@controller ~]# openstack stack list</span><br><span class="line">+--------------------------------------+------------+----------------------------------+-----------------+----------------------+--------------+</span><br><span class="line">| ID                                   | Stack Name | Project                          | Stack Status    | Creation Time        | Updated Time |</span><br><span class="line">+--------------------------------------+------------+----------------------------------+-----------------+----------------------+--------------+</span><br><span class="line">| 3110b45a-6961-42e1-ab27-c2a5f6fffc15 | user-stack | bb576f3876a24551abd6fbada80e86a1 | CREATE_COMPLETE | 2023-10-12T08:30:21Z | None         |</span><br><span class="line">+--------------------------------------+------------+----------------------------------+-----------------+----------------------+--------------+</span><br><span class="line">[root@controller ~]# openstack delete chinaskills</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">或者</span></span><br><span class="line">[root@controller ~]# openstack stack delete 77a447e0-0b9f-4357-8dad-8bffda1ee786</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> heat </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 云计算 </tag>
+            
+            <tag> 私有云 </tag>
+            
+            <tag> openstack </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>k8s-pod(两种实现机制)</title>
       <link href="/2023/09/14/2-k8s-pod-%E4%B8%A4%E7%A7%8D%E5%AE%9E%E7%8E%B0%E6%9C%BA%E5%88%B6/"/>
       <url>/2023/09/14/2-k8s-pod-%E4%B8%A4%E7%A7%8D%E5%AE%9E%E7%8E%B0%E6%9C%BA%E5%88%B6/</url>
